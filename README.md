@@ -14,6 +14,8 @@
 
 > **Important:** Prompt Prism does not call an LLM. Its analysis is a deterministic, inspectable browser-side rubric. It helps shape and compare prompt designs; it does not measure real model performance.
 
+[Open the live studio ↗](https://harshareddy0405.github.io/prompt-prism/) · [Engineering notes](docs/ENGINEERING.md) · [Quality checks](https://github.com/harshareddy0405/prompt-prism/actions)
+
 ## The problem
 
 Prompts often live in chat histories and text files, where variables are implicit, revisions are easy to lose, and “looks good” becomes the only quality check. Prompt Prism makes prompt design tangible: compile a template against sample data, compare two approaches, inspect why a rubric score changed, and capture deliberate milestones.
