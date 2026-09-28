@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Prompt Prism is a local-first workbench for designing, testing, and comparing prompt templates."
+    />
+    <meta name="theme-color" content="#0a0813" />
+    <title>Prompt Prism — Prompt design, refracted</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="quality.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to workspace</a>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Prompt Prism home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><b>Prompt</b> Prism</span>
+      </a>
+      <div class="topbar-center" aria-label="Project information">
+        <button
+          class="project-name"
+          id="projectName"
+          type="button"
+          title="Rename project"
+        >
+          <span id="projectNameText">Support reply architect</span>
+          <span class="edit-glyph" aria-hidden="true">✦</span>
+        </button>
+        <span class="save-state" id="saveState"
+          ><span></span> Saved locally</span
+        >
+      </div>
+      <div class="topbar-actions">
+        <button
+          class="icon-button"
+          id="themeButton"
+          type="button"
+          aria-label="Toggle high contrast"
+          title="Toggle high contrast"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 3a9 9 0 1 0 9 9c0-.5-.4-.9-.9-.8A7.1 7.1 0 0 1 12.8 4c0-.5-.3-1-.8-1Z"
+            />
+          </svg>
+        </button>
+        <button class="button secondary" id="exportButton" type="button">
+          Export JSON
+        </button>
+        <button class="button primary" id="snapshotButton" type="button">
+          <span aria-hidden="true">＋</span> Save version
+        </button>
+      </div>
+    </header>
+
+    <main id="workspace" class="app-shell">
+      <aside class="rail" aria-label="Prompt workspace navigation">
+        <nav class="rail-nav">
+          <button
+            class="rail-item active"
+            type="button"
+            data-view="studio"
+            aria-current="page"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m4 17 6-6 4 4 6-7M4 21h16M4 3v14" />
+            </svg>
+            <span>Studio</span>
+          </button>
+          <button class="rail-item" type="button" data-view="versions">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.5M4 4v4.5h4.5M12 8v5l3 2" />
+            </svg>
+            <span>Versions</span><em id="versionCount">2</em>
+          </button>
+          <button class="rail-item" type="button" data-view="guide">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Zm0 12.5A3.5 3.5 0 0 1 8.5 13H18"
+              />
+            </svg>
+            <span>Guide</span>
+          </button>
+        </nav>
+        <div class="rail-bottom">
+          <div class="local-badge" title="No data leaves this browser">
+            <span aria-hidden="true">◉</span> Local only
+          </div>
+          <p>Deterministic analysis.<br />No model calls.</p>
+        </div>
+      </aside>
+
+      <section
+        class="view active"
+        id="studioView"
+        data-panel="studio"
+        aria-labelledby="studioTitle"
+      >
+        <div class="studio-grid">
+          <section class="editor-panel panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Prompt canvas</p>
+                <h1 id="studioTitle">Shape the instruction</h1>
+              </div>
+              <div class="sample-wrap">
+                <label for="sampleSelect">Starting point</label>
+                <select id="sampleSelect">
+                  <option value="support">Support reply</option>
+                  <option value="research">Research brief</option>
+                  <option value="critique">Design critique</option>
+                  <option value="blank">Blank canvas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="variant-bar" role="group" aria-label="Prompt variants">
+              <button
+                id="variantATab"
+                class="variant-tab active"
+                aria-pressed="true"
+                aria-controls="promptEditor"
+                data-variant="a"
+                type="button"
+              >
+                <span class="variant-dot a"></span> Variant A
+                <small>baseline</small>
+              </button>
+              <button
+                id="variantBTab"
+                class="variant-tab"
+                aria-pressed="false"
+                aria-controls="promptEditor"
+                data-variant="b"
+                type="button"
+              >
+                <span class="variant-dot b"></span> Variant B
+                <small>challenger</small>
+              </button>
+              <button
+                class="compare-button"
+                id="compareButton"
+                type="button"
+                aria-pressed="false"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5h12M16 2l4 3-4 3M16 19H4M8 16l-4 3 4 3" />
+                </svg>
+                Compare
+              </button>
+            </div>
+
+            <div class="editor-shell">
+              <div class="editor-meta">
+                <span id="activeVariantLabel">Editing Variant A</span>
+                <span
+                  ><b id="tokenEstimate">0</b> est. tokens ·
+                  <b id="charCount">0</b> chars</span
+                >
+              </div>
+              <textarea
+                id="promptEditor"
+                spellcheck="true"
+                aria-label="Prompt template"
+                aria-describedby="templateHelp"
+              ></textarea>
+              <div class="editor-footer">
+                <span id="templateHelp"
+                  >Use <code>{{variable}}</code> to create editable
+                  inputs.</span
+                >
+                <button class="text-button" id="formatButton" type="button">
+                  Tidy spacing
+                </button>
+              </div>
+            </div>
+
+            <section class="variables-section" aria-labelledby="variablesTitle">
+              <div class="section-title-row">
+                <div>
+                  <p class="eyebrow">Template data</p>
+                  <h2 id="variablesTitle">
+                    Variables <span id="variableCount">0</span>
+                  </h2>
+                </div>
+                <button class="text-button" id="fillDemoButton" type="button">
+                  Fill demo values
+                </button>
+              </div>
+              <div class="variable-grid" id="variableGrid"></div>
+              <p class="empty-state" id="variableEmpty" hidden>
+                No variables found. Try adding <code>{{audience}}</code> to the
+                prompt.
+              </p>
+            </section>
+          </section>
+
+          <aside
+            class="inspector-panel panel"
+            aria-label="Prompt analysis and preview"
+          >
+            <div
+              class="inspector-tabs"
+              role="tablist"
+              aria-label="Inspector views"
+            >
+              <button
+                class="inspector-tab active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-inspector="analysis"
+              >
+                Analysis
+              </button>
+              <button
+                class="inspector-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-inspector="preview"
+              >
+                Preview
+              </button>
+            </div>
+
+            <div
+              class="inspector-content active"
+              id="analysisPanel"
+              data-inspector-panel="analysis"
+            >
+              <div class="score-hero">
+                <div class="score-ring" id="scoreRing" style="--score: 0">
+                  <div>
+                    <strong id="overallScore">0</strong><span>/ 100</span>
+                  </div>
+                </div>
+                <div>
+                  <p class="eyebrow">Prism score</p>
+                  <h2 id="scoreLabel">Ready to inspect</h2>
+                  <p id="scoreSummary">
+                    A deterministic rubric checks structure, specificity,
+                    guardrails, and output design.
+                  </p>
+                </div>
+              </div>
+
+              <div class="metric-list" id="metricList"></div>
+
+              <section class="suggestions" aria-labelledby="suggestionsTitle">
+                <div class="section-title-row compact">
+                  <h3 id="suggestionsTitle">Refractions</h3>
+                  <span id="suggestionCount">0 signals</span>
+                </div>
+                <div id="suggestionList"></div>
+              </section>
+
+              <button class="analyze-button" id="analyzeButton" type="button">
+                <span class="analyze-icon" aria-hidden="true">✦</span>
+                <span
+                  ><b>Analyze prompt</b
+                  ><small>Deterministic · ⌘ Enter</small></span
+                >
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+
+            <div
+              class="inspector-content"
+              id="previewPanel"
+              data-inspector-panel="preview"
+              hidden
+            >
+              <div class="preview-heading">
+                <div>
+                  <p class="eyebrow">Resolved output</p>
+                  <h2>Live preview</h2>
+                </div>
+                <button
+                  class="icon-button"
+                  id="copyPreviewButton"
+                  type="button"
+                  aria-label="Copy compiled prompt"
+                  title="Copy compiled prompt"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="8" y="8" width="11" height="12" rx="2" />
+                    <path
+                      d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div class="preview-card">
+                <div class="preview-toolbar">
+                  <span></span><span></span><span></span
+                  ><em id="unresolvedBadge">0 unresolved</em>
+                </div>
+                <pre id="compiledPreview"></pre>
+              </div>
+              <div class="preview-note">
+                <span aria-hidden="true">◈</span>
+                <p>
+                  <b>Preview, not execution.</b> Prompt Prism compiles text in
+                  your browser and never sends it to a model.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <section
+          class="comparison panel"
+          id="comparisonPanel"
+          hidden
+          aria-labelledby="comparisonTitle"
+        >
+          <div class="section-title-row">
+            <div>
+              <p class="eyebrow">Variant lens</p>
+              <h2 id="comparisonTitle">Side-by-side comparison</h2>
+            </div>
+            <button
+              class="icon-button"
+              id="closeCompareButton"
+              type="button"
+              aria-label="Close comparison"
+            >
+              ×
+            </button>
+          </div>
+          <div class="compare-summary" id="compareSummary"></div>
+          <div class="compare-grid">
+            <article>
+              <header>
+                <span class="variant-dot a"></span><b>Variant A</b
+                ><em id="scoreA">0</em>
+              </header>
+              <pre id="compareA"></pre>
+            </article>
+            <article>
+              <header>
+                <span class="variant-dot b"></span><b>Variant B</b
+                ><em id="scoreB">0</em>
+              </header>
+              <pre id="compareB"></pre>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section
+        class="view"
+        id="versionsView"
+        data-panel="versions"
+        hidden
+        aria-labelledby="versionsTitle"
+      >
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">Change ledger</p>
+            <h1 id="versionsTitle">Versions</h1>
+            <p>
+              Capture deliberate milestones, compare scores, and restore any
+              prior template.
+            </p>
+          </div>
+          <button
+            class="button primary"
+            id="snapshotButtonSecondary"
+            type="button"
+          >
+            ＋ Save current version
+          </button>
+        </div>
+        <div class="version-layout">
+          <div class="timeline panel" id="versionTimeline"></div>
+          <aside class="version-detail panel" id="versionDetail">
+            <div class="empty-illustration" aria-hidden="true">◇</div>
+            <h2>Select a version</h2>
+            <p>
+              Inspect its template, score, and timestamp before restoring it.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section
+        class="view"
+        id="guideView"
+        data-panel="guide"
+        hidden
+        aria-labelledby="guideTitle"
+      >
+        <div class="page-header">
+          <div>
+            <p class="eyebrow">Method, not magic</p>
+            <h1 id="guideTitle">A practical prompt rubric</h1>
+            <p>
+              Prompt Prism turns prompt design into an inspectable craft with
+              five clear lenses.
+            </p>
+          </div>
+        </div>
+        <div class="guide-grid">
+          <article class="guide-card" style="--accent: #b8ff6a">
+            <span>01</span>
+            <h2>Intent</h2>
+            <p>
+              Name the task and use a direct action verb. The evaluator looks
+              for explicit purpose, not prose length.
+            </p>
+          </article>
+          <article class="guide-card" style="--accent: #7de8ff">
+            <span>02</span>
+            <h2>Context</h2>
+            <p>
+              Give the audience, source material, situation, and relevant
+              background the instruction depends on.
+            </p>
+          </article>
+          <article class="guide-card" style="--accent: #bca0ff">
+            <span>03</span>
+            <h2>Constraints</h2>
+            <p>
+              Define boundaries: length, must-have criteria, exclusions, and how
+              uncertainty should be handled.
+            </p>
+          </article>
+          <article class="guide-card" style="--accent: #ff9bd5">
+            <span>04</span>
+            <h2>Output</h2>
+            <p>
+              Specify the response shape with a format, sections, fields, or a
+              short example.
+            </p>
+          </article>
+          <article class="guide-card" style="--accent: #ffd66b">
+            <span>05</span>
+            <h2>Guardrails</h2>
+            <p>
+              Tell the system what to do when information is missing and
+              discourage invented facts.
+            </p>
+          </article>
+        </div>
+        <div class="guide-callout panel">
+          <div><span aria-hidden="true">✦</span></div>
+          <div>
+            <p class="eyebrow">How scoring works</p>
+            <h2>Transparent by construction</h2>
+            <p>
+              The analyzer uses visible keyword, structure, and length checks in
+              <code>app.js</code>. It is intentionally deterministic: the same
+              prompt always earns the same result.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="dialog-backdrop" id="nameDialog" hidden>
+      <form
+        class="dialog"
+        id="nameForm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="nameDialogTitle"
+      >
+        <p class="eyebrow">Project details</p>
+        <h2 id="nameDialogTitle">Rename this workspace</h2>
+        <label for="nameInput">Project name</label>
+        <input id="nameInput" maxlength="60" autocomplete="off" />
+        <div class="dialog-actions">
+          <button class="button secondary" id="cancelNameButton" type="button">
+            Cancel</button
+          ><button class="button primary" type="submit">Save name</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="storage.js"></script>
+    <script src="schema.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
